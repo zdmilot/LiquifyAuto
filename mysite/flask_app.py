@@ -1,15 +1,10 @@
 from flask import Flask, render_template, request, Response, redirect, session, url_for
 import pandas as pd
 import openai
-from flask import Flask
-from dotenv import load_dotenv
 import os
-import re
-
-load_dotenv()
 
 app = Flask(__name__)
-openai.api_key = os.environ['OPENAI_API_KEY']
+openai.api_key = "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"
 app.secret_key = os.urandom(24)  # Add a secret key for the session
 
 @app.route('/', methods=['GET', 'POST'])
