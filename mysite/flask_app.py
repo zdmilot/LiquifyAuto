@@ -5,7 +5,7 @@ import os
 import re
 
 app = Flask(__name__)
-openai.api_key = "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"
+openai.api_key = "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"
 app.secret_key = os.urandom(24)  # Add a secret key for the session
 
 @app.route('/', methods=['GET', 'POST'])
