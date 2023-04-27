@@ -1,4 +1,0 @@
-python-dotenv
-python-openai
-msal
-azure-identity
