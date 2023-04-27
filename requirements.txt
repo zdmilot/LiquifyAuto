@@ -1,2 +1,3 @@
 python-dotenv
 python-openai
+WSGI.py file in www directory for access to os.getenv variables
