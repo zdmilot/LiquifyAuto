@@ -1,23 +1,28 @@
-import uuid
-import msal
-from flask import Flask, render_template, request, Response, redirect, session, url_for, url_for
+#import uuid
+#import msal
+from flask import Flask, render_template, request, Response, redirect, session, url_for
 import pandas as pd
 import openai
 import os
+import logging
+
+logging.basicConfig(filename='app.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s:%(message)s')
+logger = logging.getLogger(__name__)
+
 
 
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 app.secret_key = os.urandom(24)  # Add a secret key for the session
 
+
 # Add the following variables with the information obtained from the Azure portal
 CLIENT_ID = os.getenv("APP_CLIENT_ID")
 CLIENT_SECRET = os.getenv("APP_CLIENT_SECRET")
-TENANT_ID = os.getenv("APP_TENANT_ID")
-AUTHORITY = f"https://login.microsoftonline.com/common"
-GRAPH_API_ENDPOINT = "https://graph.microsoft.com/v1.0/me"
+AUTHORITY = "https://login.microsoftonline.com/common"
+#GRAPH_API_ENDPOINT = "https://graph.microsoft.com/v1.0/me"
 
-# MSAL app instance
+'''# MSAL app instance
 msal_app = msal.ConfidentialClientApplication(
     CLIENT_ID, authority=AUTHORITY, client_credential=CLIENT_SECRET
 )
@@ -46,6 +51,8 @@ def auth_redirect():
         redirect_uri=url_for("auth_redirect", _external=True),
     )
 
+    logger.debug(f"Token response: {token_response}")
+
     if "error" in token_response:
         return f"Error in token response: {token_response['error']} {token_response['error_description']}"
 
@@ -53,6 +60,7 @@ def auth_redirect():
 
     user_info = msal_app.acquire_token_for_client(["User.Read"])
     session["user"] = user_info
+    logger.debug(f"User info: {user_info}")
 
     return redirect(url_for("index"))
 
@@ -62,12 +70,12 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-
+'''
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not session.get("user"):
-        return redirect(url_for("login"))
+    #if not session.get("user"):
+    #   return redirect(url_for("login"))
 
     if request.method == 'POST':
         excel_file = request.files['file']
@@ -77,8 +85,10 @@ def index():
 
         if output_format == 'csv':
             return generate_csv(processed_data)
-        else:
+        elif output_format == 'Table':
             return render_template('index.html', data=processed_data)
+        else:
+            return render_template('index.html')
     return render_template('index.html')
 
 def process_data(df):
@@ -142,6 +152,21 @@ def restart():
     return redirect(url_for('index'))
 
 
+'''
+#error handlers
+@app.errorhandler(500)
+def internal_server_error(error):
+    logger.error(f"Internal server error: {error}")
+    return "An internal server error occurred.", 500
+
+@app.errorhandler(502)
+def bad_gateway_error(error):
+    logger.error(f"Bad Gateway error: {error}")
+    return "A bad gateway error occurred.", 502
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
+'''
