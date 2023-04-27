@@ -1,14 +1,74 @@
-from flask import Flask, render_template, request, Response, redirect, session, url_for
+import uuid
+import msal
+from flask import Flask, render_template, request, Response, redirect, session, url_for, url_for
 import pandas as pd
 import openai
 import os
+
 
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 app.secret_key = os.urandom(24)  # Add a secret key for the session
 
+# Add the following variables with the information obtained from the Azure portal
+CLIENT_ID = os.getenv("APP_CLIENT_ID")
+CLIENT_SECRET = os.getenv("APP_CLIENT_SECRET")
+TENANT_ID = os.getenv("APP_TENANT_ID")
+AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
+GRAPH_API_ENDPOINT = "https://graph.microsoft.com/v1.0/me"
+
+# MSAL app instance
+msal_app = msal.ConfidentialClientApplication(
+    CLIENT_ID, authority=AUTHORITY, client_credential=CLIENT_SECRET
+)
+
+@app.route("/login")
+def login():
+    session["state"] = str(uuid.uuid4())
+    auth_url = msal_app.get_authorization_request_url(
+        ["User.Read"],
+        state=session["state"],
+        redirect_uri=url_for("auth_redirect", _external=True),
+    )
+    return redirect(auth_url)
+
+
+@app.route("/auth/redirect")
+def auth_redirect():
+    if request.args.get("state") != session.get("state"):
+        return "State mismatch", 400
+    if "error" in request.args:
+        return f"Error: {request.args['error']} {request.args['error_description']}"
+
+    token_response = msal_app.acquire_token_by_authorization_code(
+        request.args["code"],
+        scopes=["User.Read"],
+        redirect_uri=url_for("auth_redirect", _external=True),
+    )
+
+    if "error" in token_response:
+        return f"Error in token response: {token_response['error']} {token_response['error_description']}"
+
+    session["token_cache"] = token_response
+
+    user_info = msal_app.acquire_token_for_client(["User.Read"])
+    session["user"] = user_info
+
+    return redirect(url_for("index"))
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if not session.get("user"):
+        return redirect(url_for("login"))
+
     if request.method == 'POST':
         excel_file = request.files['file']
         output_format = request.form.get('output_format', 'table')
