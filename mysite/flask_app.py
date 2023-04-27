@@ -14,7 +14,7 @@ app.secret_key = os.urandom(24)  # Add a secret key for the session
 CLIENT_ID = os.getenv("APP_CLIENT_ID")
 CLIENT_SECRET = os.getenv("APP_CLIENT_SECRET")
 TENANT_ID = os.getenv("APP_TENANT_ID")
-AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
+AUTHORITY = f"https://login.microsoftonline.com/common"
 GRAPH_API_ENDPOINT = "https://graph.microsoft.com/v1.0/me"
 
 # MSAL app instance
