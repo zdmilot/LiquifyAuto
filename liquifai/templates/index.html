@@ -7,78 +7,107 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/noscript.css') }}">
 </head>
 <body class="is-preload">
-    <!-- Wrapper -->
-    <div id="wrapper">
 
-        <!-- Three -->
-        <section id="intro" class="wrapper style1 fullscreen fade-up">
-            <div class="inner">
-                <h1>Welcome {{ user.get("name") }}!</h1>
-                <h1>Lab Sample Processor</h1>
-                <p>Extrapolates sample name, liquid class, and volume from the first three columns of a provided excel sheet and returns the result in either a table or .csv format using chatGPT AI Model Davinci 3.0.</p>
-
-                {% if not data %}
-                <form action="/" method="post" enctype="multipart/form-data">
-                    <div class="fields">
-                        <div class="field half">
-                            <label for="file">Select an Excel file:</label>
-                            <input type="file" id="file" name="file" accept=".xlsx,.txt,.docx" class="custom-file-input">
-                        </div>
-                        <div class="field half">
-                            <label for="email">Output format:</label>
-                            <select id="output_format" name="output_format">
-                                <option value="table">Table</option>
-                                <option value="csv">CSV</option>
-                            </select>
-                        </div>
-                        <div class="field half">
-                            <ul class="actions">
-                                <li><button type="submit">Process</button></li>
-                            </ul>
-                        </div>
-                    </div>
-                </form>
-
-                {% if error %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-                {% endif %}
-
+    <!-- Floating logo
+            <div class="floating-logo">
+              <img src="{{ url_for('static', filename='images/211125-sanofi-logo-rgb.png') }}" alt="Logo">
             </div>
-            {% endif %}
+        -->
+    <!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+							<li><a href="#intro" class="non-clickable">Welcome</a></li>
+							<li><a href="#one" class="non-clickable">Step 1</a></li>
+							<li><a href="#result" class="non-clickable">Result</a></li>
+							<li><a href="/logout">Logout</a></li>
+						</ul>
+					</nav>
+				</div>
+			</section>
 
-            {% if data %}
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Sample Type</th>
-                        <th>Liquid Class</th>
-                        <th>Volume</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in data %}
-                    <tr>
-                        <td>{{ row.sample_type }}</td>
-                        <td>{{ row.liquid_class }}</td>
-                        <td>{{ row.volume }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Wrapper for Body -->
+    <div id="wrapper">
+        <!-- Intro -->
+        {% if not data %}
+					<section id="intro" class="wrapper style1 fullscreen fade-up">
+						<div class="inner">
+							<h3>Welcome {{ user.get("name") }}!</h3>
+							<h1>Lab Sample Processor</h1>
+							<p>Extrapolates sample name, liquid class, and volume from the first three columns of a provided excel sheet and returns the result in either a table or .csv format using chatGPT AI Model Davinci 3.0.</p>
+							<ul class="actions">
+								<li><a href="#one" class="button scrolly">Continue</a></li>
+							</ul>
+						</div>
+					</section>
+        <!-- Main App File -->
+                    <section id="one" class="wrapper style1 fullscreen fade-up hidden">
+                        <div class="inner">
+                            <form action="/" method="post" enctype="multipart/form-data">
+                                <div class="fields">
+                                    <div class="field half">
+                                        <label for="file">Select an Excel file:</label>
+                                        <input type="file" id="file" name="file" accept=".xlsx,.txt,.docx" class="custom-file-input">
+                                    </div>
+                                    <div class="field half">
+                                        <label for="email">Output format:</label>
+                                        <select id="output_format" name="output_format">
+                                            <option value="table">Table</option>
+                                            <option value="csv">CSV</option>
+                                        </select>
+                                    </div>
+                                    <div class="field half">
+                                        <ul class="actions">
+                                            <li><button type="submit">Process</button></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </form>
 
-            <form action="/restart" method="post" style="display:inline;">
-                <ul class="actions">
-                    <li><button type="submit" name="download_csv">Download CSV</button></li>
-                    <li><button type="submit">Restart from the Beginning</button></li>
-                </ul>
-            </form>
-            {% endif %}
+                            {% if error %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </section>
+        {% endif %}
+        <!-- Main App Result -->
+        {% if data %}
+                    <section id="result" class="wrapper style1 fullscreen fade-up">
+                        <div class="inner">
+
+                            <table border="1">
+                                <thead>
+                                    <tr>
+                                        <th>Sample Type</th>
+                                        <th>Liquid Class</th>
+                                        <th>Volume</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in data %}
+                                    <tr>
+                                        <td>{{ row.sample_type }}</td>
+                                        <td>{{ row.liquid_class }}</td>
+                                        <td>{{ row.volume }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <form action="/restart" method="post" style="display:inline;">
+                                <ul class="actions">
+                                    <li><button type="submit" name="download_csv">Download CSV</button></li>
+                                    <li><button type="submit">Restart from the Beginning</button></li>
+                                </ul>
+                            </form>
+                        </div>
+                    </section>
+        {% endif %}
     </div>
-    </section>
-    </div>
-    <li><a href="/logout">Logout</a></li>
 
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>

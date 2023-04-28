@@ -1,5 +1,4 @@
 # Import necessary libraries
-import uuid
 import requests
 from flask import Flask, render_template, session, request, redirect, url_for, Response
 from flask_session import Session
@@ -18,7 +17,6 @@ Session(app)
 
 # Initialize OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
-app.secret_key = os.urandom(24)
 
 # Route for the main page
 @app.route('/', methods=['GET', 'POST'])
@@ -37,7 +35,7 @@ def index():
         input_file = request.files['file']
         if not input_file.filename:  # Check if the filename is empty (i.e., no file selected)
             error_message = "No file selected. Please select a file and try again."
-            return render_template('index.html', error=error_message)
+            return render_template('index.html', user=session["user"], version=msal.__version__, error=error_message)
         file_extension = input_file.filename.split('.')[-1]
         output_format = request.form.get('output_format', 'table')
 
