@@ -22,3 +22,7 @@ __pycache__/
 .vscode/
 *.log
 .DS_Store
+.bash_history
+.bashrc
+.vimrc
+.profile
