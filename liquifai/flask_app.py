@@ -25,7 +25,7 @@ app.secret_key = os.urandom(24)
 def index():
     if not session.get("user"):
         return redirect(url_for("login"))
-    return render_template('index.html', user=session["user"], version=msal.__version__)
+    
 
     if request.method == 'POST':
          # Check if a file is uploaded
@@ -61,12 +61,12 @@ def index():
         if output_format == 'csv':
             return generate_csv(processed_data)
         elif output_format == 'table':
-            return render_template('index.html', data=processed_data)
+            return render_template('index.html',user=session["user"], version=msal.__version__, data=processed_data)
         elif 'download_csv' in request.form:  # Check if the download CSV button was clicked
             return generate_csv(session.get('processed_data', []))
         else:
-            return render_template('index.html')
-    return render_template('index.html')
+            return render_template('index.html', user=session["user"], version=msal.__version__)
+    return render_template('index.html', user=session["user"], version=msal.__version__)
 
 # Function to process input data
 def process_data(lines):
