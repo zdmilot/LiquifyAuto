@@ -11,6 +11,9 @@ __pycache__/
 .ssh/
 .local/
 
+.virtualenvs/
+.local/
+
 # Ignore other common files and directories
 .DS_Store
 .vscode/
