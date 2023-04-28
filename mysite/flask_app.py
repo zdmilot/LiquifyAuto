@@ -1,96 +1,39 @@
-#import uuid
-#import msal
+# Import necessary libraries
 from flask import Flask, render_template, request, Response, redirect, session, url_for
 import pandas as pd
 import openai
 import os
-import logging
 
-logging.basicConfig(filename='app.log', level=logging.DEBUG, format='%(asctime)s %(levelname)s:%(message)s')
-logger = logging.getLogger(__name__)
-
-
-
+# Initialize Flask app and OpenAI API key
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 app.secret_key = os.urandom(24)  # Add a secret key for the session
 
-
-# Add the following variables with the information obtained from the Azure portal
-CLIENT_ID = os.getenv("APP_CLIENT_ID")
-CLIENT_SECRET = os.getenv("APP_CLIENT_SECRET")
-AUTHORITY = "https://login.microsoftonline.com/common"
-#GRAPH_API_ENDPOINT = "https://graph.microsoft.com/v1.0/me"
-
-'''# MSAL app instance
-msal_app = msal.ConfidentialClientApplication(
-    CLIENT_ID, authority=AUTHORITY, client_credential=CLIENT_SECRET
-)
-
-@app.route("/login")
-def login():
-    session["state"] = str(uuid.uuid4())
-    auth_url = msal_app.get_authorization_request_url(
-        ["User.Read"],
-        state=session["state"],
-        redirect_uri=url_for("auth_redirect", _external=True),
-    )
-    return redirect(auth_url)
-
-
-@app.route("/auth/redirect")
-def auth_redirect():
-    if request.args.get("state") != session.get("state"):
-        return "State mismatch", 400
-    if "error" in request.args:
-        return f"Error: {request.args['error']} {request.args['error_description']}"
-
-    token_response = msal_app.acquire_token_by_authorization_code(
-        request.args["code"],
-        scopes=["User.Read"],
-        redirect_uri=url_for("auth_redirect", _external=True),
-    )
-
-    logger.debug(f"Token response: {token_response}")
-
-    if "error" in token_response:
-        return f"Error in token response: {token_response['error']} {token_response['error_description']}"
-
-    session["token_cache"] = token_response
-
-    user_info = msal_app.acquire_token_for_client(["User.Read"])
-    session["user"] = user_info
-    logger.debug(f"User info: {user_info}")
-
-    return redirect(url_for("index"))
-
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
-
-'''
-
+# Route for the main page
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    #if not session.get("user"):
-    #   return redirect(url_for("login"))
-
     if request.method == 'POST':
+        # Get input data
         excel_file = request.files['file']
         output_format = request.form.get('output_format', 'table')
+
+        # Process input data
         df = pd.read_excel(excel_file, engine='openpyxl')
         processed_data = process_data(df)
+        session['processed_data'] = processed_data  # Save the processed data in the session
 
+        # Render output based on the chosen format
         if output_format == 'csv':
             return generate_csv(processed_data)
         elif output_format == 'table':
             return render_template('index.html', data=processed_data)
+        elif 'download_csv' in request.form:  # Check if the download CSV button was clicked
+            return generate_csv(session.get('processed_data', []))
         else:
             return render_template('index.html')
     return render_template('index.html')
 
+# Function to process input data
 def process_data(df):
     processed_data = []
 
@@ -112,6 +55,7 @@ def process_data(df):
         result = response.choices[0].text.strip()
 
         try:
+            # Split the result and assign to variables
             sample_type, liquid_class, volume = result.split(',')
 
             # Add the processed information to the list
@@ -125,9 +69,7 @@ def process_data(df):
 
     return processed_data
 
-
-
-
+# Function to generate CSV output
 def generate_csv(data):
     csv_data = "Sample Type,Liquid Class,Volume\n"
     for row in data:
@@ -138,7 +80,7 @@ def generate_csv(data):
         headers={"Content-disposition": "attachment; filename=output.csv"}
     )
 
-
+# Function to disable caching
 @app.after_request
 def add_no_cache(response):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
@@ -146,27 +88,14 @@ def add_no_cache(response):
     response.headers['Expires'] = '-1'
     return response
 
+#Function to download CSV data using session ID
 @app.route('/restart', methods=['POST'])
 def restart():
+    if 'download_csv' in request.form:
+        return generate_csv(session.get('processed_data', []))
     session.pop('processed_data', None)
     return redirect(url_for('index'))
 
-
-'''
-#error handlers
-@app.errorhandler(500)
-def internal_server_error(error):
-    logger.error(f"Internal server error: {error}")
-    return "An internal server error occurred.", 500
-
-@app.errorhandler(502)
-def bad_gateway_error(error):
-    logger.error(f"Bad Gateway error: {error}")
-    return "A bad gateway error occurred.", 502
-
-
-
+#Enables debugging module NOT FOR PRODUCTION ENVIRONMENT
 if __name__ == '__main__':
     app.run(debug=True)
-
-'''
