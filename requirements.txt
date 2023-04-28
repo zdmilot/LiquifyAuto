@@ -2,3 +2,4 @@ python-dotenv
 openai
 msal
 azure-identity
+python-docx
