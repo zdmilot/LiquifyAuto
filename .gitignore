@@ -6,10 +6,13 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.python_history
+.pythonstartup.py
 
 # Ignore SSH
 .ssh/
 .local/
+.cache/
 
 .virtualenvs/
 .local/

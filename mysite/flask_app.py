@@ -85,7 +85,7 @@ def index():
 
         if output_format == 'csv':
             return generate_csv(processed_data)
-        elif output_format == 'Table':
+        elif output_format == 'table':
             return render_template('index.html', data=processed_data)
         else:
             return render_template('index.html')
