@@ -18,8 +18,7 @@
 				<div class="inner">
 					<nav>
 						<ul>
-							<li><a href="#intro" class="non-clickable">Welcome</a></li>
-							<li><a href="#one" class="non-clickable">Step 1</a></li>
+							<li><a href="#intro" class="non-clickable">Upload</a></li>
 							<li><a href="#result" class="non-clickable">Result</a></li>
 							<li><a href="/logout">Logout</a></li>
 						</ul>
@@ -35,15 +34,7 @@
 						<div class="inner">
 							<h3>Welcome {{ user.get("name") }}!</h3>
 							<h1>Lab Sample Processor</h1>
-							<p>Extrapolates sample name, liquid class, and volume from the first three columns of a provided excel sheet and returns the result in either a table or .csv format using chatGPT AI Model Davinci 3.0.</p>
-							<ul class="actions">
-								<li><a href="#one" class="button scrolly">Continue</a></li>
-							</ul>
-						</div>
-					</section>
-        <!-- Main App File -->
-                    <section id="one" class="wrapper style1 fullscreen fade-up hidden">
-                        <div class="inner">
+							<p>Extrapolates sample name, liquid class, and volume from a provided file &#40;.xlsx,.csv,.docx,.doc,.txt&#41; and returns the result in either a table or .csv format using chatGPT AI Model Davinci 3.0.</p>
                             <form action="/" method="post" enctype="multipart/form-data">
                                 <div class="fields">
                                     <div class="field half">

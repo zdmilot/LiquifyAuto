@@ -9,6 +9,7 @@ import openai
 import os
 import io
 from docx import Document
+import csv
 
 
 app = Flask(__name__)
@@ -42,7 +43,10 @@ def index():
         # Process input data based on file type
         if file_extension == 'xlsx':
             df = pd.read_excel(input_file, engine='openpyxl')
-            lines = [f"{row[df.columns[0]]}{row[df.columns[1]]}{row[df.columns[2]]}" for _, row in df.iterrows()]
+            lines = [','.join(str(cell) for cell in row) for _, row in df.iterrows()]
+        elif file_extension == 'csv':
+            reader = csv.reader(input_file)
+            lines = [','.join(row) for row in reader]
         elif file_extension == 'txt':
             txt_data = io.StringIO(input_file.read().decode('utf-8'))
             lines = txt_data.readlines()
@@ -77,7 +81,7 @@ def process_data(lines):
         # Call the ChatGPT API to process the raw data
         response = openai.Completion.create(
             engine="text-davinci-003",
-            prompt=f"Given the laboratory sample information: \"{raw_data}\", separate the sample type, liquid class, and volume with commas. do not include labels such as sample type or use any symbols other than commas in the response",
+            prompt=f"Given the sample information: \"{raw_data}\", provide the sample type, liquid class, and volume separated by commas. Do not include labels or symbols other than commas. Omit 'uL' for volume.",
             max_tokens=50,
             n=1,
             stop=None,
