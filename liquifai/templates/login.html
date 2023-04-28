@@ -2,13 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Lab Sample Processor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/noscript.css') }}">
 </head>
-<body>
-    <h1>Microsoft Identity Python Web App</h1>
+<body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
 
-    <li><a href='{{ auth_url }}'>Sign In</a></li>
-    <hr>
-    <footer style="text-align: right">Powered by MSAL Python {{ version }}</footer>
+        <!-- Login Area -->
+        <section id="intro" class="wrapper style1 fullscreen fade-up">
+            <div class="inner">
+                <h1>Lab Sample Processor</h1>
+                <p>Extrapolates sample name, liquid class, and volume from the first three columns of a provided excel sheet and returns the result in either a table or .csv format using chatGPT AI Model Davinci 3.0.</p>
+
+                <a href="{{ auth_url }}"><img src="{{ url_for('static', filename='images/ms-symbollockup_signin_light.svg') }}"></a>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.scrollex.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.scrolly.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/browser.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/breakpoints.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/util.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
-

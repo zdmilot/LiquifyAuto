@@ -25,7 +25,7 @@ app.secret_key = os.urandom(24)
 def index():
     if not session.get("user"):
         return redirect(url_for("login"))
-    
+
 
     if request.method == 'POST':
          # Check if a file is uploaded
