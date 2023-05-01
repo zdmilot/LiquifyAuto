@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config.from_object(app_config)
 Session(app)
 
-# Initialize OpenAI API key
+# Initialize OpenAI API key can be moved to app.config in future itterations
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Route for the main page
@@ -81,7 +81,7 @@ def process_data(lines):
         # Call the ChatGPT API to process the raw data
         response = openai.Completion.create(
             engine="text-davinci-003",
-            prompt=f"Given the sample information: \"{raw_data}\", provide the sample type, liquid class, and volume separated by commas. Do not include labels or symbols other than commas. Omit 'uL' for volume.",
+            prompt=f"Given the laboratory sample information: \"{raw_data}\", provide the sample type, liquid class, and volume separated by commas. Do not include labels or symbols other than commas. Omit 'uL' for volume.",
             max_tokens=50,
             n=1,
             stop=None,
